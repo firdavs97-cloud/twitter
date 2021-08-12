@@ -7,13 +7,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"os"
 	"time"
+	"twitter.go/src/api/controller/v1/tweets"
+	"twitter.go/src/api/controller/v1/users"
 )
-
-type RouterGroup struct {
-	group         fiber.Router
-	routers       []fiber.Router
-	staticRouters []fiber.Router
-}
 
 func SetupRouter(app fiber.Router) {
 	app.Use(cors.New(cors.ConfigDefault))
@@ -28,17 +24,9 @@ func SetupRouter(app fiber.Router) {
 	}))
 	app.Post("ping/", pong)
 	api := app.Group("/api")
-
-	routers := make([]fiber.Router, 0)
-	staticRouters := make([]fiber.Router, 0)
-
-	apiVersions := make(map[string]RouterGroup)
-	apiVersions["v1"] = RouterGroup{
-		group:         api.Group("/v1"),
-		routers:       routers,
-		staticRouters: staticRouters,
-	}
-
+	apiV1 := api.Group("/v1")
+	tweets.Router(apiV1.Group("/tweets"))
+	users.Router(apiV1.Group("/users"))
 }
 
 func initPage(c *fiber.Ctx) error {
